@@ -8,14 +8,14 @@ using OrchardVNext.Test1;
 namespace OrchardVNext.Demo.Controllers {
     public class HomeController : Controller {
         private readonly ITestDependency _testDependency;
-        private readonly IContentStorageProvider _contentStorageProvider;
+        private readonly IContentStorageManager _contentStorageManager;
         private readonly IContentManager _contentManager;
 
         public HomeController(ITestDependency testDependency,
-            IContentStorageProvider contentStorageProvider,
+            IContentStorageManager contentStorageManager,
             IContentManager contentManager) {
             _testDependency = testDependency;
-            _contentStorageProvider = contentStorageProvider;
+            _contentStorageManager = contentStorageManager;
             _contentManager = contentManager;
             }
 

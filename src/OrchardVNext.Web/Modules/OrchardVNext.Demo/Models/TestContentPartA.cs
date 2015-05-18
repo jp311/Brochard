@@ -12,15 +12,15 @@ namespace OrchardVNext.Demo.Models {
         }
     }
 
-    public class ContentQueryExpressionHandler : IContentQueryExpressionHandler {
-        ContentQueryExpression IContentQueryExpressionHandler.OnCreating<TContent>(IContent content) {
-            if (!content.Has<TestContentPartA>())
-                return null;
+//    public class ContentQueryExpressionHandler : IContentQueryExpressionHandler {
+//        ContentQueryExpression IContentQueryExpressionHandler.OnCreating<TContent>(IContent content) {
+//            if (!content.Has<TestContentPartA>())
+//                return null;
 
-            return new ContentQueryExpression(
-                m => m.As<TestContentPartA>().Line == "Foo",
-                s => s.OrderBy(x => x.As<TestContentPartA>().Line)
-            );
-        }
-    }
+//            return new ContentQueryExpression(
+//                m => m.As<TestContentPartA>().Line == "Foo",
+//                s => s.OrderBy(x => x.As<TestContentPartA>().Line)
+//            );
+//        }
+//    }
 }

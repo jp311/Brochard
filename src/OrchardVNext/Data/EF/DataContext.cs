@@ -63,29 +63,29 @@ namespace OrchardVNext.Data.EF {
             _dbContextFactoryHolder.Configure(optionsBuilder);
         }
 
-        public override EntityEntry<TEntity> Add<TEntity>([NotNull]TEntity entity) {
-            var entry = base.Add<TEntity>(entity);
-            SaveChanges();
-            return entry;
-        }
+        //public override EntityEntry<TEntity> Add<TEntity>([NotNull]TEntity entity) {
+        //    var entry = base.Add<TEntity>(entity);
+        //    SaveChangesAsync();
+        //    return entry;
+        //}
 
-        public override EntityEntry Add([NotNull]object entity) {
-            var entry = base.Add(entity);
-            SaveChanges();
-            return entry;
-        }
+        //public override EntityEntry Add([NotNull]object entity) {
+        //    var entry = base.Add(entity);
+        //    SaveChangesAsync();
+        //    return entry;
+        //}
 
-        public override EntityEntry<TEntity> Remove<TEntity>([NotNull]TEntity entity) {
-            var entry = base.Remove<TEntity>(entity);
-            SaveChanges();
-            return entry;
-        }
+        //public override EntityEntry<TEntity> Remove<TEntity>([NotNull]TEntity entity) {
+        //    var entry = base.Remove<TEntity>(entity);
+        //    SaveChangesAsync();
+        //    return entry;
+        //}
 
-        public override EntityEntry Remove([NotNull]object entity) {
-            var entry = base.Remove(entity);
-            SaveChanges();
-            return entry;
-        }
+        //public override EntityEntry Remove([NotNull]object entity) {
+        //    var entry = base.Remove(entity);
+        //    SaveChangesAsync();
+        //    return entry;
+        //}
 
         //public override int SaveChanges() {
         //    var entriesToSave = ChangeTracker.StateManager.Entries

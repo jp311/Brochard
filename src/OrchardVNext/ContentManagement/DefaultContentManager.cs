@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using OrchardVNext.ContentManagement.Handlers;
 using OrchardVNext.ContentManagement.MetaData;
 using OrchardVNext.ContentManagement.MetaData.Builders;
@@ -15,10 +14,7 @@ namespace OrchardVNext.ContentManagement {
         private readonly IContentDefinitionManager _contentDefinitionManager;
         private readonly IContentManagerSession _contentManagerSession;
         private readonly IEnumerable<IContentHandler> _handlers;
-        private readonly IContentItemStore _contentItemStore;
-        private readonly IContentStorageProvider _contentStorageProvider;
-        private readonly IContentIndexProvider _contentIndexProvider;
-        private readonly IDocumentStore _documentStore;
+        private readonly IContentStorageManager _contentStorageManager;
         private readonly ShellSettings _shellSettings;
 
         private const string Published = "Published";
@@ -28,19 +24,13 @@ namespace OrchardVNext.ContentManagement {
             IContentDefinitionManager contentDefinitionManager,
             IContentManagerSession contentManagerSession,
             IEnumerable<IContentHandler> handlers,
-            IContentItemStore contentItemStore,
-            IContentStorageProvider contentStorageProvider,
-            IContentIndexProvider contentIndexProvider, 
-            IDocumentStore documentStore,
+            IContentStorageManager contentStorageManager,
             ShellSettings shellSettings) {
             _contentDefinitionManager = contentDefinitionManager;
             _contentManagerSession = contentManagerSession;
             _shellSettings = shellSettings;
             _handlers = handlers;
-            _contentItemStore = contentItemStore;
-            _contentStorageProvider = contentStorageProvider;
-            _contentIndexProvider = contentIndexProvider;
-            _documentStore = documentStore;
+            _contentStorageManager = contentStorageManager;
         }
 
         public IEnumerable<IContentHandler> Handlers => _handlers;
@@ -103,7 +93,7 @@ namespace OrchardVNext.ContentManagement {
                     return contentItem;
                 }
 
-                versionRecord = _contentItemStore.Get(id, options).ContentItem.VersionRecord;
+                versionRecord = _contentStorageManager.Get<ContentItemVersionRecord>(id, options);
             }
             else if (options.VersionNumber != 0) {
                 // short-circuit if item held in session
@@ -111,7 +101,7 @@ namespace OrchardVNext.ContentManagement {
                     return contentItem;
                 }
 
-                versionRecord = _contentItemStore.Get(id, options).ContentItem.VersionRecord;
+                versionRecord = _contentStorageManager.Get<ContentItemVersionRecord>(id, options);
             }
             else if (_contentManagerSession.RecallContentRecordId(id, out contentItem)) {
                 // try to reload a previously loaded published content item
@@ -126,7 +116,7 @@ namespace OrchardVNext.ContentManagement {
             // no record means content item is not in db
             if (versionRecord == null) {
                 // check in memory
-                var record = _contentItemStore.Get(id, options).ContentItem.VersionRecord;
+                var record = _contentStorageManager.Get<ContentItemVersionRecord>(id, options);
                 if (record == null) {
                     return null;
                 }
@@ -379,7 +369,7 @@ namespace OrchardVNext.ContentManagement {
             }
 
             contentItemRecord.Versions.Add(buildingItemVersionRecord);
-            _contentStorageProvider.Store(existingContentItem);
+            _contentStorageManager.Store<ContentItemVersionRecord>(existingContentItem.VersionRecord);
 
             var buildingContentItem = New(existingContentItem.ContentType);
             buildingContentItem.VersionRecord = buildingItemVersionRecord;
@@ -427,7 +417,7 @@ namespace OrchardVNext.ContentManagement {
                 contentItem.VersionRecord.Published = false;
             }
 
-            _contentItemStore.Store(contentItem);
+            _contentStorageManager.Store<ContentItemVersionRecord>(contentItem.VersionRecord);
 
             // build a context with the initialized instance to create
             var context = new CreateContentContext(contentItem);
@@ -705,14 +695,14 @@ namespace OrchardVNext.ContentManagement {
 
         private ContentTypeRecord AcquireContentTypeRecord(string contentType) {
             
-            var contentTypeRecord = _documentStore
+            var contentTypeRecord = _contentStorageManager
                 .Query<ContentTypeRecord>(x => x.Name == contentType)
                 .FirstOrDefault();
 
             if (contentTypeRecord == null) {
                 //TEMP: this is not safe... ContentItem types could be created concurrently?
                 contentTypeRecord = new ContentTypeRecord { Name = contentType };
-                _documentStore.Store(contentTypeRecord);
+                _contentStorageManager.Store(contentTypeRecord);
             }
 
             var contentTypeId = contentTypeRecord.Id;
@@ -722,7 +712,7 @@ namespace OrchardVNext.ContentManagement {
             // content type. Thus we need to ensure that the cache is valid, or invalidate it and retrieve it 
             // another time.
 
-            var result = _documentStore
+            var result = _contentStorageManager
                 .Query<ContentTypeRecord>(x => x.Id == contentTypeId)
                 .FirstOrDefault();
 

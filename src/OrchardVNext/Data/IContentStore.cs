@@ -1,11 +1,12 @@
-using System.Collections.Generic;
-using OrchardVNext.ContentManagement;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using OrchardVNext.ContentManagement.Records;
 
 namespace OrchardVNext.Data {
-    public interface IContentItemStore : IDependency {
-        void Store(IContent contentItem);
-        IContent Get(int id);
-        IContent Get(int id, VersionOptions options);
-        IEnumerable<IContent> GetMany(IEnumerable<int> ids);
+    public interface IContentStore : IDependency {
+        Task Store<T>(T data) where T : DocumentRecord;
+        Task<T> Get<T>(int id) where T : DocumentRecord;
+        Task<IEnumerable<T>> GetMany<T>(int[] id) where T : DocumentRecord;
+        Task Delete<T>(int id) where T : DocumentRecord;
     }
 }
