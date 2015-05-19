@@ -33,9 +33,7 @@ namespace OrchardVNext.Data.EF {
 
         public async Task Delete<T>(int id) where T : DocumentRecord {
             await Task.Run(() => {
-                var entity = Get<T>(id);
-
-                _dataContext.Remove(entity.Result);
+                _dataContext.Set<T>().Remove(Get<T>(id).Result);
             });
         }
     }
