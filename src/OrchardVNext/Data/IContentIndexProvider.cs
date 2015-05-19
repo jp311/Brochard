@@ -10,8 +10,7 @@ namespace OrchardVNext.Data {
 
         IEnumerable<int> Query<TF>(
             Expression<Func<TF, bool>> map,
-            Expression<Action<IEnumerable<TF>>> sort,
-            Func<TF, bool> reduce);
+            Expression<Action<IEnumerable<TF>>> sort);
 
         Task DeIndex(int id);
     }

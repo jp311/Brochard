@@ -13,7 +13,7 @@ namespace OrchardVNext.Data {
 
         IEnumerable<T> Query<T, TF>(Expression<Func<TF, bool>> map,
             Expression<Action<IEnumerable<TF>>> sort,
-            Func<TF, bool> reduce,
+            Func<T, bool> reduce,
             VersionOptions versionOption) where T : DocumentRecord;
 
         void Delete<T>(int id) where T : DocumentRecord;

@@ -30,8 +30,7 @@ namespace OrchardVNext.Data.EF {
 
         public IEnumerable<int> Query<TF>(
             Expression<Func<TF, bool>> map,
-            Expression<Action<IEnumerable<TF>>> sort, 
-            Func<TF, bool> reduce) {
+            Expression<Action<IEnumerable<TF>>> sort) {
 
             var mapValue = map.ToString();
             var sortValue = sort.ToString();

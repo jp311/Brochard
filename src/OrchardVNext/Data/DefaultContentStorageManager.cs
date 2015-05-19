@@ -37,10 +37,10 @@ namespace OrchardVNext.Data {
 
         public IEnumerable<T> Query<T, TF>(Expression<Func<TF, bool>> map,
             Expression<Action<IEnumerable<TF>>> sort,
-            Func<TF, bool> reduce, 
+            Func<T, bool> reduce, 
             VersionOptions versionOption) where T : DocumentRecord {
 
-            return GetMany<T>(_contentIndexProvider.Query(map, sort, reduce).ToArray(), versionOption);
+            return GetMany<T>(_contentIndexProvider.Query(map, sort).ToArray(), versionOption).Where(reduce);
         }
 
         public void Delete<T>(int id) where T : DocumentRecord {
