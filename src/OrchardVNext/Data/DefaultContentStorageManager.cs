@@ -40,7 +40,7 @@ namespace OrchardVNext.Data {
             Func<T, bool> reduce, 
             VersionOptions versionOption) where T : DocumentRecord {
 
-            return GetMany<T>(_contentIndexProvider.Query(map, sort).ToArray(), versionOption).Where(reduce);
+            return _contentIndexProvider.Query<T, TF>(map, sort).Reduce(reduce);
         }
 
         public void Delete<T>(int id) where T : DocumentRecord {
