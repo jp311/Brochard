@@ -29,17 +29,17 @@ namespace OrchardVNext.Environment
             _virtualPathProvider = serviceProvider.GetService<IVirtualPathProvider>();
         }
 
-        public Assembly Load(string name) {
+        public Assembly Load(AssemblyName assemblyName) {
             Project project;
 
-            if (!Project.TryGetProject(_virtualPathProvider.Combine(_path, name), out project)) {
+            if (!Project.TryGetProject(_virtualPathProvider.Combine(_path, assemblyName.Name), out project)) {
                 return null;
             }
 
             var cache = (ICache)_serviceProvider.GetService(typeof(ICache));
 
             var target = new LibraryKey {
-                Name = name,
+                Name = assemblyName.Name,
                 Configuration = _applicationEnvironment.Configuration,
                 TargetFramework = project.GetTargetFramework(_applicationEnvironment.RuntimeFramework).FrameworkName
             };
@@ -48,7 +48,7 @@ namespace OrchardVNext.Environment
                 _serviceProvider,
                 project.ProjectDirectory);
 
-            moduleContext.DependencyWalker.Walk(name, project.Version, target.TargetFramework);
+            moduleContext.DependencyWalker.Walk(assemblyName.Name, project.Version, target.TargetFramework);
 
             var cacheContextAccessor = (ICacheContextAccessor)_serviceProvider.GetService(typeof(ICacheContextAccessor));
             var loadContextFactory = (IAssemblyLoadContextFactory)_serviceProvider.GetService(typeof(IAssemblyLoadContextFactory)) ?? new AssemblyLoadContextFactory(_serviceProvider);
@@ -71,7 +71,7 @@ namespace OrchardVNext.Environment
                 target,
                 true);
 
-            _orchardLibraryManager.AddAdditionalLibraryExportRegistrations(name, exports);
+            _orchardLibraryManager.AddAdditionalLibraryExportRegistrations(assemblyName.Name, exports);
 
             foreach (var dependency in project.Dependencies) {
                 if (!_orchardLibraryManager.MetadataReferences.ContainsKey(dependency.Name))
@@ -88,7 +88,7 @@ namespace OrchardVNext.Environment
             
             var roslynProjectReference = new RoslynProjectReference(compliationContext);
 
-            _orchardLibraryManager.AddMetadataReference(name, roslynProjectReference);
+            _orchardLibraryManager.AddMetadataReference(assemblyName.Name, roslynProjectReference);
 
             var loadContext = _assemblyLoadContextAccessor.Default;
             return roslynProjectReference.Load(loadContext);

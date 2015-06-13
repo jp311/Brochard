@@ -5,7 +5,7 @@ namespace OrchardVNext.ContentManagement.Handlers {
         protected ContentContextBase (ContentItem contentItem) {
             ContentItem = contentItem;
             Id = contentItem.Id;
-            ContentType = contentItem.ContentType;
+            ContentType = contentItem.ContentType.N;
             ContentItemRecord = contentItem.Record;
         }
 

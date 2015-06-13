@@ -1,41 +1,20 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using OrchardVNext.ContentManagement;
-using OrchardVNext.ContentManagement.Records;
 
 namespace OrchardVNext.Data {
     public interface IContentStorageManager : IDependency {
-        void Store<T>(T data) where T : DocumentRecord;
-        T Get<T>(int id, VersionOptions versionOption) where T : DocumentRecord;
-        IEnumerable<T> GetMany<T>(int[] ids, VersionOptions versionOption) where T : DocumentRecord;
+        void Store(StorageDocument data);
 
-        IEnumerable<T> Query<T, TF>(Expression<Func<TF, bool>> map,
-            Expression<Action<IEnumerable<TF>>> sort,
-            Func<T, bool> reduce,
-            VersionOptions versionOption) where T : DocumentRecord;
+        ContentIndexResult<TContent> Query<TContent>() where TContent : StorageDocument;
+        ContentIndexResult<TContent> Query<TContent, IIndex>() 
+            where TContent : StorageDocument 
+            where IIndex : IIndex<TContent>;
 
-        void Delete<T>(int id) where T : DocumentRecord;
+        void Delete<T>(int id) where T : StorageDocument;
     }
 
-    public static class ContentStorageManagerExtensions {
-        public static IEnumerable<T> Query<T>(this IContentStorageManager manager, 
-            Expression<Func<T, bool>> map,
-            Expression<Action<IEnumerable<T>>> sort,
-            Func<T, bool> reduce) where T : DocumentRecord {
-            return manager.Query<T, T>(map, sort, reduce, VersionOptions.Published);
-        }
-
-        public static IEnumerable<T> Query<T>(this IContentStorageManager manager,
-            Expression<Func<T, bool>> map,
-            Expression<Action<IEnumerable<T>>> sort) where T : DocumentRecord {
-            return manager.Query<T, T>(map, sort, (r) => true, VersionOptions.Published);
-        }
-
-        public static IEnumerable<T> Query<T>(this IContentStorageManager manager,
-            Expression<Func<T, bool>> map) where T : DocumentRecord {
-            return manager.Query<T, T>(map, (s) => s.OrderBy(p => p.Id) , (r) => true, VersionOptions.Published);
-        }
+    public interface IIndex<TContent> where TContent : StorageDocument {
+        Expression<Func<IEnumerable<TContent>, IEnumerable<int>>> Map { get; }
     }
 }

@@ -1,9 +1,9 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace OrchardVNext.Data.EF {
-    public class ContentIndex<T> {
+namespace OrchardVNext.Data {
+    public class ContentIndexResult<T> {
         public IEnumerable<T> Records { get; set; }
 
         public IEnumerable<T> Reduce(Func<T, bool> reduce) {

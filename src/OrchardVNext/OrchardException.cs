@@ -1,4 +1,4 @@
-﻿using OrchardVNext.Localization;
+using OrchardVNext.Localization;
 using System;
 
 namespace OrchardVNext {

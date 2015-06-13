@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -10,7 +10,10 @@ using OrchardVNext.Environment.Configuration;
 
 namespace OrchardVNext.Data.EF {
     public interface IDataContext {
-        DataContext Context { get; }
+        IDataContext Context { get; }
+
+        EntityEntry Add(object entity);
+        IQueryable<T> Query<T>() where T : class;
     }
 
     public class DataContext : DbContext, IDataContext {
@@ -31,7 +34,11 @@ namespace OrchardVNext.Data.EF {
             _instanceId = Guid.NewGuid();
         }
 
-        public DataContext Context => this;
+        public IDataContext Context => this;
+
+        public IQueryable<T> Query<T>() where T : class {
+            return Set<T>();
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             Logger.TraceInformation("[{0}]: Mapping Records to DB Context", GetType().Name);
@@ -49,7 +56,7 @@ namespace OrchardVNext.Data.EF {
 
                 foreach (var type in entityTypes) {
                     Logger.Debug("Mapping record {0}", type.FullName);
-                    
+
                     entityMethod.MakeGenericMethod(type)
                         .Invoke(modelBuilder, new object[0]);
                 }
@@ -59,7 +66,7 @@ namespace OrchardVNext.Data.EF {
             Logger.TraceInformation("[{0}]: Records Mapped in {1}ms", GetType().Name, sw.ElapsedMilliseconds);
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+        protected override void OnConfiguring(EntityOptionsBuilder optionsBuilder) {
             _dbContextFactoryHolder.Configure(optionsBuilder);
         }
 
