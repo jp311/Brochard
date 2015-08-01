@@ -6,7 +6,7 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Routing;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
-using Microsoft.Framework.Runtime;
+using Microsoft.Dnx.Runtime;
 using OrchardVNext.Environment.Configuration;
 using OrchardVNext.Environment.Extensions.Loaders;
 using OrchardVNext.Environment.ShellBuilders.Models;
@@ -48,9 +48,6 @@ namespace OrchardVNext.Environment.ShellBuilders {
                 var instance = (IModule) Activator.CreateInstance(dependency.Type);
                 instance.Configure(serviceCollection);
             }
-
-            var p = _serviceProvider.GetService<IOrchardLibraryManager>();
-            serviceCollection.AddInstance<IAssemblyProvider>(new OrchardMvcAssemblyProvider(p, _serviceProvider, _serviceProvider.GetService<IAssemblyLoaderContainer>()));
 
             foreach (var dependency in blueprint.Dependencies
                 .Where(t => !typeof(IModule).IsAssignableFrom(t.Type)))
